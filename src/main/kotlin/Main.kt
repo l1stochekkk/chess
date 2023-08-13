@@ -14,6 +14,7 @@ fun main() {
     if (readLine() != "y") return
     var currentPlayer: String
     for (turn in 1..Int.MAX_VALUE) {
+        //TODO make check for reset global state for pawns
         currentPlayer = swapCurrentPlayer(turn)
         chessMap.print(turn)
         while (true) {

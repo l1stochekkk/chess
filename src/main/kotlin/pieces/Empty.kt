@@ -4,7 +4,8 @@ import Tile
 
 object Empty : Piece {
     override val player = "no player"
-    override fun canMove(firstTile: Tile, secondTile: Tile): Boolean {
-        TODO("Not yet implemented")
+
+    override fun availableMovementsFrom(currentTile: Tile): List<Tile> {
+        return emptyList()
     }
 }

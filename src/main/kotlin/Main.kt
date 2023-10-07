@@ -16,14 +16,15 @@ fun main() {
     for (turn in 1..Int.MAX_VALUE) {
         //TODO make check for reset global state for pawns
         currentPlayer = swapCurrentPlayer(turn)
-
-        if (checkForMate(currentPlayer)) {
-            println("Player $currentPlayer has lost!")
-            break
-        }
-
         chessMap.print(turn)
         while (true) {
+
+            if (checkForMate(currentPlayer)) {
+                println("Player $currentPlayer has lost!")
+            }
+
+            if (checkForCheck(currentPlayer)) println("$currentPlayer king is checked")
+
             val inputText = readLine() ?: continue
 
             val currentTile = parseMove(inputText)?.first ?: continue
@@ -41,18 +42,15 @@ fun main() {
 
             currentTile.movePieceTo(secondTile)
 
-            if (checkForCheck(currentPlayer)) {
-                println("Your king is in check")
-                secondTile.movePieceTo(currentTile)
-                continue
-            }
+            break
         }
     }
 }
+
 fun findKing(player: String) = chessMap.flatten().find { it.piece is King && it.piece.player == player }!!
 
 fun allAvailableEnemyMovements(player: String) =
-    chessMap.flatten().filter { it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(it).distinct() }
+    chessMap.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(it) }.distinct()
 
 fun checkForCheck(player: String) = findKing(player) in allAvailableEnemyMovements(player)
 

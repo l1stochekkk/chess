@@ -11,6 +11,8 @@ class Tile(val position: String) {
 
     fun isEmpty() = piece == Empty
 
+    fun isNotEmpty() = piece != Empty
+
     fun movePieceTo(secondTile: Tile) {
         secondTile.piece = piece
         piece = Empty

@@ -1,6 +1,7 @@
 package pieces
 
 import Tile
+import allAvailableEnemyMovements
 import getAvailableTileForPosition
 import positionsFromTile
 
@@ -16,5 +17,12 @@ class King(override val player: String) : Piece {
             getAvailableTileForPosition(x - i, y + i, player)?.let { posTileList.add(it) }
         }
         return posTileList
+        //return posTileList.filter { it !in allAvailableEnemyMovements(player) }
     }
+
+    override fun canMove(firstTile: Tile, secondTile: Tile): Boolean =
+        secondTile in availableMovementsFrom(firstTile).filter { it !in allAvailableEnemyMovements(player) }
+
 }
+
+//

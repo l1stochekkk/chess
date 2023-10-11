@@ -1,5 +1,4 @@
 import pieces.*
-
 val chessMap: List<List<Tile>> = (8 downTo 1).map { num ->
     ('a'..'h').map { char ->
         Tile("$char$num").apply {
@@ -19,54 +18,63 @@ fun main() {
         chessMap.print(turn)
         while (true) {
 
-            if (checkForMate(currentPlayer)) {
+            if (checkForMate(chessMap, currentPlayer)) {
                 println("Player $currentPlayer has lost!")
             }
 
-            if (checkForCheck(currentPlayer)) println("$currentPlayer king is checked")
+            if (checkForCheck(chessMap, currentPlayer)) println("$currentPlayer king is checked")
 
             val inputText = readLine() ?: continue
 
-            val currentTile = parseMove(inputText)?.first ?: continue
-            val secondTile = parseMove(inputText)?.second ?: continue
+            val currentTile = parseMove(chessMap, inputText)?.first ?: continue
+            val secondTile = parseMove(chessMap, inputText)?.second ?: continue
 
             if (currentTile.piece.player != currentPlayer) {
                 println("You don`t have a piece on $currentTile")
                 continue
             }
 
-            if (!currentTile.piece.canMove(currentTile, secondTile)) {
+            if (!currentTile.piece.canMove(chessMap, currentTile, secondTile)) {
                 println("This ${currentTile.piece.name} can`t move from ${currentTile.position} on $secondTile")
                 continue
             }
 
             currentTile.movePieceTo(secondTile)
 
+            if (checkForCheck(chessMap, currentPlayer)) {
+                println("Your king will be under attack")
+                secondTile.movePieceTo(currentTile)
+                continue
+            }
+
             break
         }
     }
 }
 
-fun findKing(player: String) = chessMap.flatten().find { it.piece is King && it.piece.player == player }!!
+fun findKing(map: List<List<Tile>>, player: String) = map.flatten().find { it.piece is King && it.piece.player == player }!!
 
-fun allAvailableEnemyMovements(player: String) =
-    chessMap.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(it) }.distinct()
+fun allAvailableEnemyMovements(map: List<List<Tile>>, player: String) =
+    map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
 
-fun checkForCheck(player: String) = findKing(player) in allAvailableEnemyMovements(player)
+fun allAvailableEnemyMovementsKing(map: List<List<Tile>>,player: String) =
+    map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
 
-fun checkForMate(player: String): Boolean {
-    val kingTile = findKing(player)
-    return checkForCheck(player) && kingTile.piece.availableMovementsFrom(kingTile).isEmpty()
+fun checkForCheck(map: List<List<Tile>>, player: String) = findKing(map, player) in allAvailableEnemyMovements(map, player)
+
+fun checkForMate(map: List<List<Tile>>, player: String): Boolean {
+    val kingTile = findKing(chessMap, player)
+    return checkForCheck(map, player) && kingTile.piece.availableMovementsFrom(map, kingTile).isEmpty()
 }
 
 fun swapCurrentPlayer(turn: Int): String {
     return if (turn % 2 == 0) "green" else "blue"
 }
 
-fun parseMove(inputText: String): Pair<Tile, Tile>? {
+fun parseMove(map: List<List<Tile>>, inputText: String): Pair<Tile, Tile>? {
     if (!"^[a-h][1-8][a-h][1-8]\$".toRegex().matches(inputText)) {
         println("Incorrect input")
         return null
     }
-    return Pair(tileFromPosition(inputText[0], inputText[1]), tileFromPosition(inputText[2], inputText[3]))
+    return Pair(tileFromPosition(map, inputText[0], inputText[1]), tileFromPosition(map, inputText[2], inputText[3]))
 }

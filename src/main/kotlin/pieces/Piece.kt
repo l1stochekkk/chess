@@ -2,6 +2,8 @@ package pieces
 
 import Tile
 import checkForCheck
+import getAvailableTileForPosition
+import positionsFromTile
 
 interface Piece {
 
@@ -20,7 +22,17 @@ interface Piece {
             else -> "x"
         }
 
-    fun availableMovementsFrom(currentTile: Tile): List<Tile>
+    fun availableMovementsFrom(map: List<List<Tile>>, currentTile: Tile): List<Tile>
 
-    fun canMove(firstTile: Tile, secondTile: Tile): Boolean = secondTile in availableMovementsFrom(firstTile) && !checkForCheck(player)
+    fun calculateMove(currentTile: Tile, xSign: Int, ySign: Int, posTileList: MutableList<Tile>){
+        val (x, y) = positionsFromTile(currentTile)
+        for (i in 1..7) {
+            val possibleTile = getAvailableTileForPosition(x + i * xSign, y + i * ySign, player) ?: break
+            posTileList.add(possibleTile)
+            if (possibleTile.isNotEmpty()) break
+        }
+    }
+
+    fun canMove(map: List<List<Tile>>, firstTile: Tile, secondTile: Tile): Boolean =
+        secondTile in availableMovementsFrom(map, firstTile) && !checkForCheck(map, player)
 }

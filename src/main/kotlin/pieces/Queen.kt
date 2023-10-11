@@ -1,20 +1,14 @@
 package pieces
 
 import Tile
-import getAvailableTileForPosition
-import positionsFromTile
 
 class Queen(override val player: String) : Piece {
 
-    override fun availableMovementsFrom(currentTile: Tile): List<Tile> {
-        val (x, y) = positionsFromTile(currentTile)
+    override fun availableMovementsFrom(map: List<List<Tile>>, currentTile: Tile): List<Tile> {
+        val signs = listOf(1 to 1, 1 to -1, -1 to 1, -1 to -1, 0 to 1, 0 to -1, -1 to 0, 1 to 0)
         val posTileList = mutableListOf<Tile>()
-        for (i in -7..7) {
-            getAvailableTileForPosition(x + i, y, player)?.let { posTileList.add(it) }
-            getAvailableTileForPosition(x, y + i, player)?.let { posTileList.add(it) }
-            getAvailableTileForPosition(x + i, y + i, player)?.let { posTileList.add(it) }
-            getAvailableTileForPosition(x - i, y + i, player)?.let { posTileList.add(it) }
-        }
+        signs.forEach { calculateMove(currentTile, it.first, it.second, posTileList) }
+
         return posTileList
     }
 }

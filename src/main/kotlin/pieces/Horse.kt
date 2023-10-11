@@ -6,15 +6,20 @@ import positionsFromTile
 
 class Horse(override val player: String) : Piece {
 
-    override fun availableMovementsFrom(currentTile: Tile): List<Tile> {
+    override fun availableMovementsFrom(map: List<List<Tile>>, currentTile: Tile): List<Tile> {
+
+        val signs = listOf(1 to 1, 1 to -1, -1 to 1, -1 to -1)
         val (x, y) = positionsFromTile(currentTile)
         val posTileList = mutableListOf<Tile>()
-        for (i in -1..1 step 2) {
-            for (n in -2..2 step 4) {
-                getAvailableTileForPosition(x + i, y + n, player)?.let { posTileList.add(it) }
-                getAvailableTileForPosition(x + n, y + i, player)?.let { posTileList.add(it) }
+
+        signs.forEach { (xSign, ySign) ->
+            for (i in 1..2) {
+                val possibleTile = getAvailableTileForPosition(x + i * xSign, y + (3 - i)  * ySign, player) ?: break
+                posTileList.add(possibleTile)
+                if (possibleTile.isNotEmpty()) break
             }
         }
+
         return posTileList
     }
 }

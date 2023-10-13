@@ -1,5 +1,5 @@
-import pieces.*
-import kotlin.math.abs
+import pieces.Empty
+import pieces.Piece
 
 class Tile(val position: String) {
 
@@ -31,21 +31,6 @@ fun getAvailableTileForPosition(x: Int, y: Int, player: String): Tile? {
     if (!(x to y).inMapBounds()) return null
     val possibleTile = chessMap[y][x]
     return if (possibleTile.isEmpty() || possibleTile.piece.player != player) {
-        possibleTile
-    } else null
-}
-
-fun getAvailableTileForPawnPosition(map: List<List<Tile>>, oldPoses: Pair<Int, Int>, x: Int, y: Int, player: String): Tile? {
-    if (!(x to y).inMapBounds()) return null
-    val possibleTile = chessMap[y][x]
-    if (oldPoses.first == x && oldPoses.second == 1 or 6 && possibleTile.isEmpty() && abs(oldPoses.second - y) == 2){
-        if (player == "blue") tileFromPosition(map, oldPoses.first.toChar(), (oldPoses.second - 1).toChar()).hadPawnLastTurn = true
-        if (player == "green") tileFromPosition(map, oldPoses.first.toChar(), (oldPoses.second + 1).toChar()).hadPawnLastTurn = true
-        return possibleTile
-    }
-    return if (oldPoses.first == x && possibleTile.isEmpty()) {
-        possibleTile
-    } else return if (possibleTile.hadPawnLastTurn || (!possibleTile.isEmpty() && possibleTile.piece.player != player)) {
         possibleTile
     } else null
 }

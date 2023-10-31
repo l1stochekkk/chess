@@ -1,5 +1,7 @@
 import pieces.Empty
+import pieces.Pawn
 import pieces.Piece
+import kotlin.math.abs
 
 class Tile(val position: String) {
 
@@ -7,17 +9,22 @@ class Tile(val position: String) {
 
     var piece: Piece = Empty
 
-    var hadPawnLastTurn = false
-
     fun isEmpty() = piece == Empty
 
     fun isNotEmpty() = piece != Empty
 
     fun movePieceTo(secondTile: Tile) {
+        enPassant = if ((piece is Pawn) && abs(secondTile.position[1].digitToInt() - position[1].digitToInt()) == 2) {
+            "${position[0]}" + "${(position[1].digitToInt() + secondTile.position[1].digitToInt()) / 2}"
+        } else ""
+
+        if (piece is Pawn && secondTile.isEmpty() && secondTile.position[0] != position[0]) {
+            tileFromPosition(chessMap, secondTile.position[0], position[1]).piece = Empty
+        }
+
         secondTile.piece = piece
         piece = Empty
     }
-
 }
 
 fun Pair<Int, Int>.inMapBounds() = first in (0..7) && second in (0..7)

@@ -1,6 +1,7 @@
 package pieces
 
 import Tile
+import enPassant
 import getAvailableTileForPosition
 import positionsFromTile
 
@@ -16,11 +17,12 @@ class Pawn(override val player: String) : Piece {
         if (possibleTile != null) {
             if (xSign != 0 && possibleTile.isNotEmpty() && possibleTile.piece.player != player) posTileList.add(possibleTile)
             if (ySign == 2 && (positionsFromTile(currentTile).second == 1 || positionsFromTile(currentTile).second == 6)
-                && possibleTile.isEmpty()) posTileList.add(possibleTile)
+                && possibleTile.isEmpty()) {
+                posTileList.add(possibleTile)
+            }
             if ((ySign == 1 && xSign == 0) && possibleTile.isEmpty()) posTileList.add(possibleTile)
 
-            //if (xSign != 0 && possibleTile.isEmpty() && possibleTile.hadPawnLastTurn) posTileList.add(possibleTile)
-            //TODO pawn`s diagonal movement on empty tile
+            if (xSign != 0 && possibleTile.isEmpty() && possibleTile.position == enPassant) posTileList.add(possibleTile)
         }
     }
 
@@ -28,7 +30,6 @@ class Pawn(override val player: String) : Piece {
         val signs = listOf(0 to 1, 0 to 2, 1 to 1, -1 to 1)
         val posTileList = mutableListOf<Tile>()
         signs.forEach { calculateMove(currentTile, it.first, it.second, posTileList) }
-
         return posTileList
     }
 

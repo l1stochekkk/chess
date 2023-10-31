@@ -1,4 +1,5 @@
 import pieces.*
+
 val chessMap: List<List<Tile>> = (8 downTo 1).map { num ->
     ('a'..'h').map { char ->
         Tile("$char$num").apply {
@@ -6,6 +7,7 @@ val chessMap: List<List<Tile>> = (8 downTo 1).map { num ->
         }
     }
 }
+var enPassant = ""
 
 fun main() {
     println("Welcome to chess!")

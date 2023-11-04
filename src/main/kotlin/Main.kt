@@ -25,7 +25,7 @@ fun main() {
                 break
             }
 
-            if (checkForStalemate(chessMap, currentPlayer)){
+            if (checkForStalemate(chessMap, currentPlayer)) {
                 println("Stalemate! Draw!")
                 break
             }
@@ -62,11 +62,11 @@ fun main() {
 
 fun findKing(map: List<List<Tile>>, player: String) = map.flatten().find { it.piece is King && it.piece.player == player }!!
 
-fun allAvailableEnemyMovements(map: List<List<Tile>>, player: String) =
-    map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
-
 fun allAvailablePlayersMovements(map: List<List<Tile>>,player: String) =
     map.flatten().filter { it.piece.player == player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
+
+fun allAvailableEnemyMovements(map: List<List<Tile>>, player: String) =
+    map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
 
 fun allAvailableEnemyMovementsKing(map: List<List<Tile>>,player: String) =
     map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()

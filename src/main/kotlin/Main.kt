@@ -22,6 +22,12 @@ fun main() {
 
             if (checkForMate(chessMap, currentPlayer)) {
                 println("Player $currentPlayer has lost!")
+                break
+            }
+
+            if (checkForStalemate(chessMap, currentPlayer)){
+                println("Stalemate! Draw!")
+                break
             }
 
             if (checkForCheck(chessMap, currentPlayer)) println("$currentPlayer king is checked")
@@ -59,6 +65,9 @@ fun findKing(map: List<List<Tile>>, player: String) = map.flatten().find { it.pi
 fun allAvailableEnemyMovements(map: List<List<Tile>>, player: String) =
     map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
 
+fun allAvailablePlayersMovements(map: List<List<Tile>>,player: String) =
+    map.flatten().filter { it.piece.player == player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
+
 fun allAvailableEnemyMovementsKing(map: List<List<Tile>>,player: String) =
     map.flatten().filter { it.piece != Empty && it.piece.player != player }.flatMap { it.piece.availableMovementsFrom(map, it) }.distinct()
 
@@ -68,6 +77,9 @@ fun checkForMate(map: List<List<Tile>>, player: String): Boolean {
     val kingTile = findKing(chessMap, player)
     return checkForCheck(map, player) && kingTile.piece.availableMovementsFrom(map, kingTile).isEmpty()
 }
+
+fun checkForStalemate(map: List<List<Tile>>, player: String) = allAvailablePlayersMovements(map, player).isEmpty()
+
 
 fun swapCurrentPlayer(turn: Int): String {
     return if (turn % 2 == 0) "green" else "blue"

@@ -63,7 +63,7 @@ class Tile(val position: String) {
         }
     }
 
-    //fun swapRookMovingState() = if (piece is Rook) (piece as Rook).isPieceMoved = true else
+    fun swapRookMovingState() = run { if (piece is Rook) (piece as Rook).isPieceMoved = true }
 
     fun isEmpty() = piece == Empty
     fun isNotEmpty() = piece != Empty
@@ -74,7 +74,7 @@ class Tile(val position: String) {
         enPassantMove(secondTile)
         pawnUpgrade(secondTile)
         stalemateMove(secondTile)
-        if (piece is Rook) (piece as Rook).isPieceMoved = true
+        swapRookMovingState()
 
         secondTile.piece = piece
         piece = Empty

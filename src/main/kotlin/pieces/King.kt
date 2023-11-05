@@ -23,20 +23,30 @@ class King(override val player: String) : Piece {
         //7, 7 - down/right
 
         if (abs(xSign) == 2 && !isPieceMoved) {
-            val list = listOf(Triple(0, 0, "c8"), Triple(0,7,"g8"), Triple(7, 0, "c1"), Triple(7, 7 ,"g1"))
+            val list = listOf(
+                Triple(0, 0, "c8"),
+                Triple(0,7,"g8"),
+                Triple(7, 0, "c1"),
+                Triple(7, 7 ,"g1"))
             for (i in list){
-                val rook = chessMap[i.first][i.second].piece
-                if (possibleTile.position == i.third && rook is Rook) {
+                val number = i.first
+                val letter = i.second
+                val newKingPosition = i.third
+                val rook = chessMap[number][letter].piece
+                if (possibleTile.position == newKingPosition && rook is Rook) {
                     if (!rook.isPieceMoved) {
-                        val castlingSpace = when (i.third){
+                        val castlingSpace = when (newKingPosition){
                             "c8" -> listOf("e8", "d8", "c8", "b8", "a8")
                             "h8" -> listOf("e8", "f8", "g8", "h8")
                             "c1" -> listOf("e1", "d1", "c1", "b1", "a1")
                             "g1" -> listOf("e1", "f1", "g1", "h1")
-                            else -> listOf("pizdec")
+                            else -> return
                         }
-                        val checkForSpaceIsUnderAttack = {castlingSpace.filter{ tileFromPosition(chessMap, it[0], it[1]) !in allAvailableEnemyMovements(chessMap, player)} == castlingSpace}
-                        val checkSpaceBetweenPieces = {castlingSpace.subList(1, castlingSpace.size - 1).filter { it.isNotEmpty() } == castlingSpace.subList(1, castlingSpace.size - 1)}
+                        val checkForSpaceIsUnderAttack = {
+                            castlingSpace.filter{ tileFromPosition(chessMap, it[0], it[1]) !in allAvailableEnemyMovements(chessMap, player)} == castlingSpace }
+                        val checkSpaceBetweenPieces = {
+                            val castlingSpaceSublisted = castlingSpace.subList(1, castlingSpace.size - 1)
+                            castlingSpaceSublisted.filter { it.isNotEmpty() } == castlingSpaceSublisted }
                         if (checkForSpaceIsUnderAttack.invoke() && checkSpaceBetweenPieces.invoke()){
                             posTileList.add(possibleTile)
                         }

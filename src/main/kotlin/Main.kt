@@ -26,7 +26,7 @@ fun main() {
             }
 
             if (checkForStalemate(chessMap, currentPlayer)) {
-                println("Stalemate! Draw!")
+                println("Stalemate, Draw!")
                 break
             }
 

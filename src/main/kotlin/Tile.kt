@@ -7,28 +7,18 @@ class Tile(val position: String) {
 
     var piece: Piece = Empty
 
-    fun isEmpty() = piece == Empty
-
-    fun isNotEmpty() = piece != Empty
-
-    fun movePieceTo(secondTile: Tile) {
-        enPassant = if ((piece is Pawn) && abs(secondTile.position[1].digitToInt() - position[1].digitToInt()) == 2) {
-            "${position[0]}" + "${(position[1].digitToInt() + secondTile.position[1].digitToInt()) / 2}"
-        } else ""
-
-        if (piece is Pawn && secondTile.isEmpty() && secondTile.position[0] != position[0]) {
-            tileFromPosition(chessMap, secondTile.position[0], position[1]).piece = Empty
-        }
-
-        if (piece is Pawn && secondTile.position[1].digitToInt() == 1 || secondTile.position[1].digitToInt() == 8) {
+    private fun pawnUpgrade(secondTile: Tile){
+        val numberOfSecondTile = secondTile.position[1].digitToInt()
+        if (piece is Pawn && numberOfSecondTile == 1 || numberOfSecondTile == 8) {
+            val player = piece.player
             println("Choose new piece (type 'H', 'B', 'R' or 'Q')")
             while (true) {
                 val inputText = readLine() ?: continue
                 piece = when (inputText) {
-                    "H" -> Horse(piece.player)
-                    "B" -> Bishop(piece.player)
-                    "R" -> Rook(piece.player)
-                    "Q" -> Queen(piece.player)
+                    "H" -> Horse(player)
+                    "B" -> Bishop(player)
+                    "R" -> Rook(player)
+                    "Q" -> Queen(player)
                     else -> {
                         println("Wrong input")
                         continue
@@ -37,21 +27,54 @@ class Tile(val position: String) {
                 break
             }
         }
+    }
 
-        if (piece is Rook) (piece as Rook).isPieceMoved = true
+    private fun swapEnPassant(secondTile: Tile){
+        enPassant = if ((piece is Pawn) && abs(secondTile.position[1].digitToInt() - position[1].digitToInt()) == 2) {
+            "${position[0]}" + "${(position[1].digitToInt() + secondTile.position[1].digitToInt()) / 2}"
+        } else ""
+    }
 
+    private fun enPassantMove(secondTile: Tile){
+        if (piece is Pawn && secondTile.isEmpty() && secondTile.position[0] != position[0]) {
+            tileFromPosition(chessMap, secondTile.position[0], position[1]).piece = Empty
+        }
+    }
+
+    private fun stalemateMove(secondTile: Tile){
         if (piece is King) {
             (piece as King).isPieceMoved = false
             if (abs(positionsFromTile(this).first - positionsFromTile(secondTile).first) == 2){
-                val list = listOf(Triple("a8", "c8", "c3"), Triple("h8", "g8", "f8"), Triple("a1", "c1", "c1"), Triple("h1", "g1", "f1"))
+                val list = listOf(
+                    Triple("a8", "c8", "c3"),
+                    Triple("h8", "g8", "f8"),
+                    Triple("a1", "c1", "c1"),
+                    Triple("h1", "g1", "f1"))
                 for (i in list){
-                    if (i.second == secondTile.position){
-                        tileFromPosition(chessMap, i.third[0], i.third[1]).piece = Rook(piece.player)
-                        tileFromPosition(chessMap, i.first[0], i.first[1]).piece = Empty
+                    val newKingPosition = i.second
+                    if (newKingPosition == secondTile.position){
+                        val oldRookPosition = i.first
+                        val newRookPosition = i.third
+                        tileFromPosition(chessMap, newRookPosition[0], newRookPosition[1]).piece = Rook(piece.player)
+                        tileFromPosition(chessMap, oldRookPosition[0], oldRookPosition[1]).piece = Empty
                     }
                 }
             }
         }
+    }
+
+    //fun swapRookMovingState() = if (piece is Rook) (piece as Rook).isPieceMoved = true else
+
+    fun isEmpty() = piece == Empty
+    fun isNotEmpty() = piece != Empty
+
+    fun movePieceTo(secondTile: Tile) {
+
+        swapEnPassant(secondTile)
+        enPassantMove(secondTile)
+        pawnUpgrade(secondTile)
+        stalemateMove(secondTile)
+        if (piece is Rook) (piece as Rook).isPieceMoved = true
 
         secondTile.piece = piece
         piece = Empty
